@@ -3,9 +3,9 @@ from tortoise import fields
 from tortoise.contrib.pydantic import pydantic_model_creator
 class Product(Model):
     id = fields.IntField(pk=True)
-    name = fields.CharField(max_length=30, nulllable=False)
+    name = fields.CharField(max_length=30, null=False)
     quantity_in_stock = fields.IntField(default=0)
-    quantity_solf = fields.IntField(Default=0)
+    quantity_sold = fields.IntField(default=0)
     unit_price = fields.DecimalField(max_digits=8, decimal_places=2, default=0.00)
     supplied_by = fields.ForeignKeyField('models.supplier',
     related_name="goods_supplied")
