@@ -5,7 +5,18 @@ from tortoise.contrib.fastapi import register_tortoise
 from fastapi import FastAPI, HTTPException
 from models import (supplier_pydantic, supplier_pydanticIn, Supplier, product_pydanticIn, 
 product_pydantic,Product)
+from typing import List
+# email
+from fastapi import BackgroundTasks, FastAPI
+from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
+from pydantic import BaseModel, EmailStr
+from starlette.responses import JSONResponse
 
+# dotenv
+from dotenv import dotenv_values
+ 
+# credentials
+creddentials = dotenv_values(".env")
 
 
 app = FastAPI()
@@ -86,6 +97,49 @@ async def delete_product(id= int):
     return {"status": "ok"}
 
 
+class EmailSchema(BaseModel):
+    email: List[EmailStr]
+
+class EmailContent(BaseModel):
+    message : str
+    subject : str
+
+conf = ConnectionConfig(
+    MAIL_USERNAME = creddentials['EMAIL'],
+    MAIL_PASSWORD = creddentials['PASS'],
+    MAIL_FROM = creddentials['EMAIL'],
+    MAIL_PORT = 465,
+    MAIL_SERVER = "smtp.gmail.com",
+    MAIL_STARTTLS = False,
+    MAIL_SSL_TLS = True,
+    USE_CREDENTIALS = True,
+    VALIDATE_CERTS = True
+)
+
+@app.post('/email/{product_id}')
+async def send_email(product_id: int, content: EmailContent):
+    product = await Product.get(id = product_id)
+    supplier = await product.supplied_by
+    supplier_email = [supplier.email]
+    html = f"""
+    <h5>Fadeenan Company</h5> 
+    <br>
+    <p>Dear {supplier.name},</p>
+    <p>{content.message}</p>
+    <br>
+    <p>Best Regards,</p>
+    <p>Fadeenan Company</p>
+    """
+    message = MessageSchema(
+    subject=content.subject,
+    recipients=supplier_email,
+    body=html,
+    subtype=MessageType.html)
+    fm = FastMail(conf)
+    await fm.send_message(message)
+    return {"status": "ok"}
+
+        
 
 register_tortoise(
     app,
