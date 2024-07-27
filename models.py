@@ -26,5 +26,5 @@ class Supplier(Model):
 product_pydantic = pydantic_model_creator(Product, name="Product")
 product_pydanticIn = pydantic_model_creator(Product, name="ProductIn", exclude_readonly=True)
 
-Supplier_pydantic = pydantic_model_creator(Supplier, name="Supplier")
-Supplier_pydanticIn = pydantic_model_creator(Supplier, name="SupplierIn", exclude_readonly=True)
+supplier_pydantic = pydantic_model_creator(Supplier, name="Supplier")
+supplier_pydanticIn = pydantic_model_creator(Supplier, name="SupplierIn", exclude_readonly=True)
