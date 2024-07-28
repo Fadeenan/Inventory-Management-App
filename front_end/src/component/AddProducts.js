@@ -7,10 +7,10 @@ const AddProduct = () => {
     const [productInfo, setProductInfo] = useState(
         {
         ProductName: "",
-        QuantityInStock: "",
-        QuantitySold: "",
-        UnitPrice: "",
-        Revenue: "",
+        QuantityInStock: 0,
+        QuantitySold: 0,
+        UnitPrice: 0,
+        Revenue: 0,
         Supplier: ""
         }
     )

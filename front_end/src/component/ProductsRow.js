@@ -1,7 +1,7 @@
 import React from "react";
 import { Button } from "react-bootstrap";
 
-const ProductsRow = ({ id, name, quantity_in_stock, quantity_sold, unit_price, revenue, handleDelete }) => {
+const ProductsRow = ({ id, name, quantity_in_stock, quantity_sold, unit_price, revenue, handleDelete, handleUpdate }) => {
     return (
         <tr>
             <td>{id}</td>
@@ -11,7 +11,7 @@ const ProductsRow = ({ id, name, quantity_in_stock, quantity_sold, unit_price, r
             <td>{unit_price}</td>
             <td>{revenue}</td>
             <td>
-                <Button variant="outline-info" size="sm" className="mr-2">
+                <Button onClick={() => handleUpdate(id)} variant="outline-info" size="sm" className="mr-2">
                     Update
                 </Button>
                 <Button variant="outline-success" size="sm" className="mr-1">
