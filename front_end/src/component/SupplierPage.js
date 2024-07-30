@@ -135,7 +135,7 @@ const SupplierPage = () => {
         if (response.ok) {
             alert("Email sent successfully");
         } else {
-            alert("Failed to send email: " + result.detail);
+            alert("Failed to send email: " + JSON.stringify(result));
         }
 
         setSupplierDetail({
