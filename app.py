@@ -84,8 +84,21 @@ async def add_product(supplier_id: int, product_details: product_pydanticIn): # 
 
 @app.get('/product')
 async def all_products():
-    response = await product_pydantic.from_queryset(Product.all())
-    return {"status": "ok", "data" :response}
+    products = await Product.all().prefetch_related('supplied_by')
+    products_data = [
+        {
+            "id": product.id,
+            "name": product.name,
+            "quantity_in_stock": product.quantity_in_stock,
+            "quantity_sold": product.quantity_sold,
+            "unit_price": product.unit_price,
+            "revenue": product.revenue,
+            "supplier_id": product.supplied_by.id
+        }
+        for product in products
+    ]
+    return {"status": "ok", "data": products_data}
+
 
 
 @app.get('/product/{id}')
@@ -131,10 +144,9 @@ conf = ConnectionConfig(
     VALIDATE_CERTS = True
 )
 
-@app.post('/email/{product_id}')
-async def send_email(product_id: int, content: EmailContent):
-    product = await Product.get(id = product_id)
-    supplier = await product.supplied_by
+@app.post('/email/{supplier_id}')
+async def send_email(supplier_id: int, content: EmailContent):
+    supplier = await Supplier.get(id = supplier_id)
     supplier_email = [supplier.email]
     html = f"""
     <h5>Fadeenan Company</h5> 

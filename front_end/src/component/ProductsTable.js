@@ -3,11 +3,13 @@ import { Table } from 'react-bootstrap';
 import { ProductContext } from "../ProductContext";
 import ProductsRow from "./ProductsRow";
 import { useNavigate } from 'react-router-dom';
-import { UpdateContext } from "../UpdateProductContext"; // แก้ไขการนำเข้า
+import { UpdateContext } from "../UpdateProductContext";
+import { SupplierContext } from "../SupplierContext";
 
 const ProductsTable = () => {
     const [products, setProducts] = useContext(ProductContext);
-    const [updateProductInfo, setUpdateProductInfo] = useContext(UpdateContext); // แก้ไขการใช้ useContext
+    const [updateProductInfo, setUpdateProductInfo] = useContext(UpdateContext);
+    const [supplierDetail, setSupplierDetail] = useContext(SupplierContext);
 
     let navigate = useNavigate();
 
@@ -40,7 +42,7 @@ const ProductsTable = () => {
     };
 
     const handleUpdate = (id) => {
-        const product = products.data.find(product => product.id === id); // แก้ไขการค้นหา product
+        const product = products.data.find(product => product.id === id);
         setUpdateProductInfo({
             ProductName: product.name,
             QuantityInStock: product.quantity_in_stock,
@@ -50,6 +52,24 @@ const ProductsTable = () => {
             ProductId: id
         });
         navigate("/updateproduct");
+    };
+
+    const handleSupplier = (supplier_id) => {
+        console.log(supplier_id);
+        fetch("http://localhost:8000/supplier/" + supplier_id, {
+            headers: {
+                Accept: 'application/json'
+            }
+        }).then(resp => {
+            return resp.json();
+        }).then(result => {
+            if (result.status === 'ok') {
+                setSupplierDetail({ ...result.data });
+                navigate("/supplierpage");
+            } else {
+                alert("error");
+            }
+        });
     };
 
     useEffect(() => {
@@ -85,8 +105,10 @@ const ProductsTable = () => {
                             quantity_sold={product.quantity_sold}
                             unit_price={product.unit_price}
                             revenue={product.revenue}
+                            supplier_id={product.supplier_id} // Add supplier_id here
                             handleDelete={handleDelete}
                             handleUpdate={handleUpdate}
+                            handleSupplier={handleSupplier}
                         />
                     ))}
                 </tbody>

@@ -6,6 +6,8 @@ import ProductsTable from "./component/ProductsTable";
 import AddProduct from "./component/AddProducts";
 import UpdateProduct from "./component/UpdateProduct";
 import { UpdateProductContextProvider } from "./UpdateProductContext";
+import SupplierPage from "./component/SupplierPage";
+import { SupplierContextProvider } from "./SupplierContext";
 
 function App() {
   return (
@@ -13,6 +15,7 @@ function App() {
       <Router>
         <ProductProvider>
           <UpdateProductContextProvider> {/* Move the context provider here */}
+          <SupplierContextProvider>
             <NavBar />
             <div className="container">
               <div className="row justify-content-center">
@@ -20,11 +23,13 @@ function App() {
                   <Routes>
                     <Route path="/" element={<ProductsTable />} />
                     <Route path="/updateproduct" element={<UpdateProduct />} />
+                    <Route path="/supplierpage" element={<SupplierPage />} />
                     <Route path="/addproduct" element={<AddProduct />} />
                   </Routes>
                 </div>
               </div>
             </div>
+            </SupplierContextProvider>
           </UpdateProductContextProvider>
         </ProductProvider>
       </Router>
