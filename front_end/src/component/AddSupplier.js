@@ -52,46 +52,50 @@ const AddSupplier = () => {
             <Card.Body>
                 <Form onSubmit={postData}>
                     <Form.Group controlId="name">
-                        <Form.Label>Name</Form.Label>
+                        <Form.Label>Name <span style={{ color: 'red' }}>*</span></Form.Label>
                         <Form.Control
                             type="text"
                             name="name"
                             value={supplierInfo.name}
                             onChange={updateForm}
                             placeholder="Supplier's Name"
+                            required
                         />
                     </Form.Group>
 
                     <Form.Group controlId="email">
-                        <Form.Label>Email</Form.Label>
+                        <Form.Label>Email <span style={{ color: 'red' }}>*</span></Form.Label>
                         <Form.Control
                             type="email"
                             name="email"
                             value={supplierInfo.email}
                             onChange={updateForm}
                             placeholder="Email Address"
+                            required
                         />
                     </Form.Group>
 
                     <Form.Group controlId="phone">
-                        <Form.Label>Phone Number</Form.Label>
+                        <Form.Label>Phone Number <span style={{ color: 'red' }}>*</span></Form.Label>
                         <Form.Control
                             type="text"
                             name="phone"
                             value={supplierInfo.phone}
                             onChange={updateForm}
                             placeholder="Phone"
+                            required
                         />
                     </Form.Group>
 
                     <Form.Group controlId="company">
-                        <Form.Label>Company</Form.Label>
+                        <Form.Label>Company <span style={{ color: 'red' }}>*</span></Form.Label>
                         <Form.Control
                             type="text"
                             name="company"
                             value={supplierInfo.company}
                             onChange={updateForm}
                             placeholder="Company"
+                            required
                         />
                     </Form.Group>
 

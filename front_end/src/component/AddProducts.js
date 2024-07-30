@@ -80,67 +80,73 @@ const AddProduct = () => {
             <Card.Body>
                 <Form onSubmit={postData}>
                     <Form.Group controlId="ProductName">
-                        <Form.Label>Product Name</Form.Label>
+                        <Form.Label>Product Name <span style={{ color: 'red' }}>*</span></Form.Label>
                         <Form.Control
                             type="text"
                             name="ProductName"
                             value={productInfo.ProductName}
                             onChange={updateForm}
                             placeholder="Product Name"
+                            required
                         />
                     </Form.Group>
 
                     <Form.Group controlId="QuantityInStock">
-                        <Form.Label>Quantity In Stock</Form.Label>
+                        <Form.Label>Quantity In Stock <span style={{ color: 'red' }}>*</span></Form.Label>
                         <Form.Control
                             type="number"
                             name="QuantityInStock"
                             value={productInfo.QuantityInStock}
                             onChange={updateForm}
                             placeholder="Quantity In Stock"
+                            required
                         />
                     </Form.Group>
 
                     <Form.Group controlId="QuantitySold">
-                        <Form.Label>Quantity Sold</Form.Label>
+                        <Form.Label>Quantity Sold <span style={{ color: 'red' }}>*</span></Form.Label>
                         <Form.Control
                             type="number"
                             name="QuantitySold"
                             value={productInfo.QuantitySold}
                             onChange={updateForm}
                             placeholder="Quantity Sold"
+                            required
                         />
                     </Form.Group>
 
                     <Form.Group controlId="UnitPrice">
-                        <Form.Label>Unit Price</Form.Label>
+                        <Form.Label>Unit Price <span style={{ color: 'red' }}>*</span></Form.Label>
                         <Form.Control
                             type="number"
                             name="UnitPrice"
                             value={productInfo.UnitPrice}
                             onChange={updateForm}
                             placeholder="Unit Price"
+                            required
                         />
                     </Form.Group>
 
                     <Form.Group controlId="Revenue">
-                        <Form.Label>Revenue</Form.Label>
+                        <Form.Label>Revenue <span style={{ color: 'red' }}>*</span></Form.Label>
                         <Form.Control
                             type="number"
                             name="Revenue"
                             value={productInfo.Revenue}
                             onChange={updateForm}
                             placeholder="Revenue"
+                            required
                         />
                     </Form.Group>
 
                     <Form.Group controlId="Supplier">
-                        <Form.Label>Supplier</Form.Label>
+                        <Form.Label>Supplier <span style={{ color: 'red' }}>*</span></Form.Label>
                         <Form.Control
                             as="select"
                             name="Supplier"
                             value={productInfo.Supplier}
                             onChange={updateForm}
+                            required
                         >
                             <option value="">Select Supplier</option>
                             {suppliers.map(supplier => (

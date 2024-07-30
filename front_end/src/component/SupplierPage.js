@@ -11,6 +11,7 @@ const SupplierPage = () => {
 
     const handleAdd = async (e) => {
         e.preventDefault();
+        console.log(supplierDetail);
 
         const url = "http://localhost:8000/supplier";
 
@@ -35,18 +36,18 @@ const SupplierPage = () => {
         const result = await response.json();
         if (response.ok) {
             alert("Supplier added successfully");
+            setSupplierDetail({
+                name: "",
+                email: "",
+                phone: "",
+                company: "",
+                id: result.data.id,
+                emailTitle: "",
+                email_msg: ""
+            });
         } else {
             alert("Failed to add supplier: " + result.detail);
         }
-
-        setSupplierDetail({
-            name: "",
-            email: "",
-            phone: "",
-            company: "",
-            emailTitle: "",
-            email_msg: ""
-        });
     };
 
     const handleUpdate = async (e) => {
@@ -139,6 +140,7 @@ const SupplierPage = () => {
         }
 
         setSupplierDetail({
+            ...supplierDetail,
             emailTitle: "",
             email_msg: ""
         });
@@ -156,6 +158,7 @@ const SupplierPage = () => {
                             value={supplierDetail.name}
                             onChange={updateForm}
                             placeholder="Supplier's Name"
+                            required
                         />
                     </Form.Group>
 
@@ -167,17 +170,19 @@ const SupplierPage = () => {
                             value={supplierDetail.email}
                             onChange={updateForm}
                             placeholder="Email Address"
+                            required
                         />
                     </Form.Group>
 
                     <Form.Group controlId="phone">
                         <Form.Label>Phone Number</Form.Label>
                         <Form.Control
-                            type="number"
+                            type="text"
                             name="phone"
                             value={supplierDetail.phone}
                             onChange={updateForm}
                             placeholder="Phone"
+                            required
                         />
                     </Form.Group>
 
@@ -189,44 +194,47 @@ const SupplierPage = () => {
                             value={supplierDetail.company}
                             onChange={updateForm}
                             placeholder="Company"
+                            required
                         />
                     </Form.Group>
 
                     <Form.Group controlId="emailTitle">
                         <Form.Label>Email Title</Form.Label>
                         <Form.Control
-                            type="Text"
+                            type="text"
                             name="emailTitle"
                             value={supplierDetail.emailTitle}
                             onChange={updateForm}
                             placeholder="Email Title"
+                            required
                         />
                     </Form.Group>
 
                     <Form.Group controlId="email_msg">
                         <Form.Label>Email Content</Form.Label>
                         <Form.Control
-                            type="textfield"
+                            type="text"
                             name="email_msg"
                             value={supplierDetail.email_msg}
                             onChange={updateForm}
                             placeholder="Email Content"
+                            required
                         />
                     </Form.Group>
 
-                    <Button onClick={handleUpdate} className="btn btn-primary m-1" variant="primary">
+                    <Button onClick={handleUpdate} className="btn btn-outline-info m-1" variant="primary">
                         Update
                     </Button>
 
-                    <Button onClick={handleAdd} className="btn btn-success m-1" variant="primary">
+                    <Button onClick={handleAdd} className="btn btn-outline-primary m-1" variant="primary">
                         Add Supplier
                     </Button>
 
-                    <Button onClick={handleEmail} className="btn btn-info m-1" variant="primary">
+                    <Button onClick={handleEmail} className="btn btn-outline-secondary m-1" variant="primary">
                         Send Email
                     </Button>
 
-                    <Button onClick={handleDelete} className="btn btn-danger m-1" variant="primary">
+                    <Button onClick={handleDelete} className="btn btn-outline-danger m-1" variant="primary">
                         Delete
                     </Button>
                 </Form>
