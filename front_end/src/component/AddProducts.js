@@ -1,141 +1,163 @@
-import React, { useState } from "react";
-import { Form,Button, Card } from "react-bootstrap";
-
+import React, { useState, useEffect } from "react";
+import { Form, Button, Card } from "react-bootstrap";
 
 const AddProduct = () => {
-
-    const [productInfo, setProductInfo] = useState(
-        {
+    const [productInfo, setProductInfo] = useState({
         ProductName: "",
         QuantityInStock: 0,
         QuantitySold: 0,
         UnitPrice: 0,
         Revenue: 0,
         Supplier: ""
-        }
-    )
+    });
+
+    const [suppliers, setSuppliers] = useState([]);
+
+    useEffect(() => {
+        fetch("http://localhost:8000/supplier")
+            .then(resp => resp.json())
+            .then(result => {
+                if (result.status === "ok") {
+                    setSuppliers(result.data);
+                } else {
+                    alert("Failed to fetch suppliers");
+                }
+            })
+            .catch(error => {
+                console.error(error);
+                alert("Failed to fetch suppliers");
+            });
+    }, []);
+
     const updateForm = (e) => {
-        setProductInfo(
-            {...productInfo, [e.target.name] : e.target.value}
-        )
-    }
+        setProductInfo({ ...productInfo, [e.target.name]: e.target.value });
+    };
+
     const postData = async (e) => {
         e.preventDefault();
-        console.log(productInfo)
-    
-        const url = "http://localhost:8000/product/" + productInfo['Supplier'] 
+        console.log(productInfo);
 
-        const response = await fetch(
-            url, {
-                method: 'POST',
-                mode: 'cors',
-                cache: 'no-cache',
-                credentials: 'same-origin', 
-                headers: {
-                'Content-Type': 'application/json'
-                },
-                redirect: 'follow',
-                referrerPolicy: 'no-referrer', 
-                body: JSON.stringify({
-                    "name": productInfo['ProductName'],
-                    "quantity_in_stock": productInfo['QuantityInStock'],
-                    "quantity_sold": productInfo['QuantitySold'],
-                    "unit_price": productInfo['UnitPrice'],
-                    "revenue": productInfo['Revenue']
-                }) 
-            });
-        response.json().then(response => {
-            if (response.status === 'ok') {
-                alert("Product added successfully")
-            } else {
-                alert("Failed to add product")
-            }
+        const url = "http://localhost:8000/product/" + productInfo.Supplier;
+
+        const response = await fetch(url, {
+            method: "POST",
+            mode: "cors",
+            cache: "no-cache",
+            credentials: "same-origin",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            redirect: "follow",
+            referrerPolicy: "no-referrer",
+            body: JSON.stringify({
+                name: productInfo.ProductName,
+                quantity_in_stock: productInfo.QuantityInStock,
+                quantity_sold: productInfo.QuantitySold,
+                unit_price: productInfo.UnitPrice,
+                revenue: productInfo.Revenue
+            })
         });
+
+        const result = await response.json();
+        if (response.ok) {
+            alert("Product added successfully");
+        } else {
+            alert("Failed to add product: " + result.detail);
+        }
+
         setProductInfo({
             ProductName: "",
-            QuantityInStock: "",
-            QuantitySold: "",
-            UnitPrice: "",
-            Revenue: "",
+            QuantityInStock: 0,
+            QuantitySold: 0,
+            UnitPrice: 0,
+            Revenue: 0,
             Supplier: ""
         });
-    }
+    };
+
     return (
-    <Card>
-        <Card.Body>
-            <Form onSubmit={postData}>
-                <Form.Group controlId='ProductName'>
-                    <Form.Label>Product Name</Form.Label>
-                    <Form.Control
-                        type='text'
-                        name='ProductName'
-                        value={productInfo.ProductName}
-                        onChange={updateForm}
-                        placeholder='Product Name'
-                    />
-                </Form.Group>
+        <Card>
+            <Card.Body>
+                <Form onSubmit={postData}>
+                    <Form.Group controlId="ProductName">
+                        <Form.Label>Product Name</Form.Label>
+                        <Form.Control
+                            type="text"
+                            name="ProductName"
+                            value={productInfo.ProductName}
+                            onChange={updateForm}
+                            placeholder="Product Name"
+                        />
+                    </Form.Group>
 
-                <Form.Group controlId='QuantityInStock'>
-                    <Form.Label>Quantity In Stock</Form.Label>
-                    <Form.Control
-                        type='number'
-                        name='QuantityInStock'
-                        value={productInfo.QuantityInStock}
-                        onChange={updateForm}
-                        placeholder='Quantity In Stock'
-                    />
-                </Form.Group>
+                    <Form.Group controlId="QuantityInStock">
+                        <Form.Label>Quantity In Stock</Form.Label>
+                        <Form.Control
+                            type="number"
+                            name="QuantityInStock"
+                            value={productInfo.QuantityInStock}
+                            onChange={updateForm}
+                            placeholder="Quantity In Stock"
+                        />
+                    </Form.Group>
 
-                <Form.Group controlId='QuantitySold'>
-                    <Form.Label>Quantity Sold</Form.Label>
-                    <Form.Control
-                        type='number'
-                        name='QuantitySold'
-                        value={productInfo.QuantitySold}
-                        onChange={updateForm}
-                        placeholder='Quantity Sold'
-                    />
-                </Form.Group>
+                    <Form.Group controlId="QuantitySold">
+                        <Form.Label>Quantity Sold</Form.Label>
+                        <Form.Control
+                            type="number"
+                            name="QuantitySold"
+                            value={productInfo.QuantitySold}
+                            onChange={updateForm}
+                            placeholder="Quantity Sold"
+                        />
+                    </Form.Group>
 
-                <Form.Group controlId='UnitPrice'>
-                    <Form.Label>Unit Price</Form.Label>
-                    <Form.Control
-                        type='number'
-                        name='UnitPrice'
-                        value={productInfo.UnitPrice}
-                        onChange={updateForm}
-                        placeholder='Unit Price'
-                    />
-                </Form.Group>
+                    <Form.Group controlId="UnitPrice">
+                        <Form.Label>Unit Price</Form.Label>
+                        <Form.Control
+                            type="number"
+                            name="UnitPrice"
+                            value={productInfo.UnitPrice}
+                            onChange={updateForm}
+                            placeholder="Unit Price"
+                        />
+                    </Form.Group>
 
-                <Form.Group controlId='Revenue'>
-                    <Form.Label>Revenue</Form.Label>
-                    <Form.Control
-                        type='number'
-                        name='Revenue'
-                        value={productInfo.Revenue}
-                        onChange={updateForm}
-                        placeholder='Revenue'
-                    />
-                </Form.Group>
+                    <Form.Group controlId="Revenue">
+                        <Form.Label>Revenue</Form.Label>
+                        <Form.Control
+                            type="number"
+                            name="Revenue"
+                            value={productInfo.Revenue}
+                            onChange={updateForm}
+                            placeholder="Revenue"
+                        />
+                    </Form.Group>
 
-                <Form.Group controlId='Supplier'>
-                    <Form.Label>Supplier</Form.Label>
-                    <Form.Control
-                        type='number'
-                        name='Supplier'
-                        value={productInfo.Supplier}
-                        onChange={updateForm}
-                        placeholder='Supplier'
-                    />
-                </Form.Group>
+                    <Form.Group controlId="Supplier">
+                        <Form.Label>Supplier</Form.Label>
+                        <Form.Control
+                            as="select"
+                            name="Supplier"
+                            value={productInfo.Supplier}
+                            onChange={updateForm}
+                        >
+                            <option value="">Select Supplier</option>
+                            {suppliers.map(supplier => (
+                                <option key={supplier.id} value={supplier.id}>
+                                    {supplier.name}
+                                </option>
+                            ))}
+                        </Form.Control>
+                    </Form.Group>
 
-                <Button variant='primary' type='submit'>
-                    Submit
-                </Button>
-            </Form>
-        </Card.Body>
-    </Card>
+                    <Button variant="primary" type="submit">
+                        Submit
+                    </Button>
+                </Form>
+            </Card.Body>
+        </Card>
     );
-}
+};
+
 export default AddProduct;

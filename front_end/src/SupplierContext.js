@@ -1,5 +1,4 @@
-import react, { useState, useContext, createContext } from 'react'
-
+import React, { useState, createContext } from "react";
 
 export const SupplierContext = createContext();
 
@@ -12,11 +11,11 @@ export const SupplierContextProvider = (props) => {
         id: "",
         emailTitle: "",
         email_msg: ""
-    })
+    });
 
     return (
         <SupplierContext.Provider value={[supplierDetail, setSupplierDetail]}>
             {props.children}
         </SupplierContext.Provider>
-    )
-}
+    );
+};

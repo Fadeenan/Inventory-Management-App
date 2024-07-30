@@ -8,27 +8,29 @@ import UpdateProduct from "./component/UpdateProduct";
 import { UpdateProductContextProvider } from "./UpdateProductContext";
 import SupplierPage from "./component/SupplierPage";
 import { SupplierContextProvider } from "./SupplierContext";
+import AddSupplier from "./component/AddSupplier";
 
 function App() {
   return (
     <div>
       <Router>
         <ProductProvider>
-          <UpdateProductContextProvider> {/* Move the context provider here */}
-          <SupplierContextProvider>
-            <NavBar />
-            <div className="container">
-              <div className="row justify-content-center">
-                <div className="col-sm-10 col-xm-12 mt-4 mb-4">
-                  <Routes>
-                    <Route path="/" element={<ProductsTable />} />
-                    <Route path="/updateproduct" element={<UpdateProduct />} />
-                    <Route path="/supplierpage" element={<SupplierPage />} />
-                    <Route path="/addproduct" element={<AddProduct />} />
-                  </Routes>
+          <UpdateProductContextProvider>
+            <SupplierContextProvider>
+              <NavBar />
+              <div className="container">
+                <div className="row justify-content-center">
+                  <div className="col-sm-10 col-xm-12 mt-4 mb-4">
+                    <Routes>
+                      <Route path="/" element={<ProductsTable />} />
+                      <Route path="/updateproduct" element={<UpdateProduct />} />
+                      <Route path="/supplierpage" element={<SupplierPage />} />
+                      <Route path="/addproduct" element={<AddProduct />} />
+                      <Route path="/addsupplier" element={<AddSupplier />} />
+                    </Routes>
+                  </div>
                 </div>
               </div>
-            </div>
             </SupplierContextProvider>
           </UpdateProductContextProvider>
         </ProductProvider>

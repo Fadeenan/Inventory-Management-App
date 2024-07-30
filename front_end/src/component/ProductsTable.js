@@ -1,8 +1,8 @@
 import React, { useContext, useEffect } from "react";
-import { Table } from 'react-bootstrap';
+import { Table } from "react-bootstrap";
 import { ProductContext } from "../ProductContext";
 import ProductsRow from "./ProductsRow";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 import { UpdateContext } from "../UpdateProductContext";
 import { SupplierContext } from "../SupplierContext";
 
@@ -17,22 +17,17 @@ const ProductsTable = () => {
         fetch("http://127.0.0.1:8000/product/" + id, {
             method: "DELETE",
             headers: {
-                'Accept': 'application/json'
+                "Accept": "application/json"
             }
         })
-        .then(resp => {
-            if (resp.ok) {
-                return resp.json();
-            }
-            throw new Error('Product deletion failed');
-        })
+        .then(resp => resp.json())
         .then(result => {
-            if (result.status === 'ok') {
+            if (result.status === "ok") {
                 const filteredProducts = products.data.filter((product) => product.id !== id);
                 setProducts({ data: [...filteredProducts] });
                 alert("Product deleted");
             } else {
-                alert("Product deletion failed");
+                alert("Product deletion failed: " + result.detail);
             }
         })
         .catch(error => {
@@ -55,20 +50,23 @@ const ProductsTable = () => {
     };
 
     const handleSupplier = (supplier_id) => {
-        console.log(supplier_id);
         fetch("http://localhost:8000/supplier/" + supplier_id, {
             headers: {
-                Accept: 'application/json'
+                "Accept": "application/json"
             }
-        }).then(resp => {
-            return resp.json();
-        }).then(result => {
-            if (result.status === 'ok') {
+        })
+        .then(resp => resp.json())
+        .then(result => {
+            if (result.status === "ok") {
                 setSupplierDetail({ ...result.data });
                 navigate("/supplierpage");
             } else {
-                alert("error");
+                alert("Error: " + result.detail);
             }
+        })
+        .catch(error => {
+            console.error(error);
+            alert("Failed to fetch supplier details");
         });
     };
 
@@ -76,8 +74,11 @@ const ProductsTable = () => {
         fetch("http://127.0.0.1:8000/product")
             .then(resp => resp.json())
             .then(results => {
-                console.log(results);
-                setProducts({ "data": [...results.data] });
+                setProducts({ data: [...results.data] });
+            })
+            .catch(error => {
+                console.error(error);
+                alert("Failed to fetch products");
             });
     }, [setProducts]);
 
@@ -105,7 +106,7 @@ const ProductsTable = () => {
                             quantity_sold={product.quantity_sold}
                             unit_price={product.unit_price}
                             revenue={product.revenue}
-                            supplier_id={product.supplier_id} // Add supplier_id here
+                            supplier_id={product.supplier_id}
                             handleDelete={handleDelete}
                             handleUpdate={handleUpdate}
                             handleSupplier={handleSupplier}

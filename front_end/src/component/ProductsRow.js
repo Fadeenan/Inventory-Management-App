@@ -15,7 +15,7 @@ const ProductsRow = ({ id, name, quantity_in_stock, quantity_sold, unit_price, r
                     Update
                 </Button>
                 <Button 
-               onClick={() => handleSupplier(supplier_id)} variant="outline-success" size="sm" className="mr-1">
+                    onClick={() => handleSupplier(supplier_id)} variant="outline-success" size="sm" className="mr-1">
                     Supplier
                 </Button>
                 <Button onClick={() => handleDelete(id)} variant="outline-danger" size="sm" className="mr-2">
