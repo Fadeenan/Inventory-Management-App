@@ -214,19 +214,19 @@ const SupplierPage = () => {
                         />
                     </Form.Group>
 
-                    <Button onClick={handleUpdate} className="btn btn-outline-info m-1" variant="primary">
+                    <Button onClick={handleUpdate} className="btn btn-primary m-1" variant="primary">
                         Update
                     </Button>
 
-                    <Button onClick={handleAdd} className="btn btn-outline-primary m-1" variant="primary">
+                    <Button onClick={handleAdd} className="btn btn-success m-1" variant="primary">
                         Add Supplier
                     </Button>
 
-                    <Button onClick={handleEmail} className="btn btn-outline-secondary m-1" variant="primary">
+                    <Button onClick={handleEmail} className="btn btn-info m-1" variant="primary">
                         Send Email
                     </Button>
 
-                    <Button onClick={handleDelete} className="btn btn-outline-danger m-1" variant="primary">
+                    <Button onClick={handleDelete} className="btn btn-danger m-1" variant="primary">
                         Delete
                     </Button>
                 </Form>
