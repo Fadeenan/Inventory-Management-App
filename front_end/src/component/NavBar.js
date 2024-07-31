@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { Navbar, Nav, Form, FormControl, Button, Badge } from 'react-bootstrap';
 import { Link, useNavigate } from 'react-router-dom';
 import { ProductContext } from '../ProductContext';
@@ -8,7 +8,14 @@ const NavBar = () => {
     const [search, setSearch] = useState("");
     const [products, setProducts] = useContext(ProductContext);
     const { authToken, setAuthToken } = useContext(AuthContext);
+    const [originalProducts, setOriginalProducts] = useState([]);
     let navigate = useNavigate();
+
+    useEffect(() => {
+        if (Array.isArray(products.data)) {
+            setOriginalProducts(products.data);
+        }
+    }, [products]);
 
     const updateSearch = (e) => {
         setSearch(e.target.value);
@@ -17,9 +24,9 @@ const NavBar = () => {
     const filterProduct = (e) => {
         e.preventDefault();
         if (search.trim() === "") {
-            setProducts({ data: products });
+            setProducts({ data: originalProducts });
         } else {
-            const filteredProducts = products.filter(product => 
+            const filteredProducts = originalProducts.filter(product => 
                 product.name.toLowerCase().includes(search.toLowerCase())
             );
             setProducts({ data: filteredProducts });
