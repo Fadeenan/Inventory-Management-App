@@ -1,16 +1,20 @@
+import logging
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from tortoise.contrib.fastapi import register_tortoise
-from fastapi import FastAPI, HTTPException
+from fastapi import Depends, FastAPI, HTTPException, status
 from models import (supplier_pydantic, supplier_pydanticIn, Supplier, product_pydanticIn, 
-product_pydantic, Product)
+product_pydantic, Product, user_pydantic, user_pydanticIn, User)
 from typing import List
 from fastapi_mail import ConnectionConfig, FastMail, MessageSchema, MessageType
 from pydantic import BaseModel, EmailStr
 from starlette.responses import JSONResponse
 from dotenv import dotenv_values
-
-creddentials = dotenv_values(".env")
-
+import jwt
+import datetime
+from passlib.context import CryptContext
 from fastapi.middleware.cors import CORSMiddleware
+# Load environment variables
+creddentials = dotenv_values(".env")
 
 app = FastAPI()
 
@@ -26,12 +30,109 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
+SECRET_KEY = creddentials["SECRET_KEY"]
+ALGORITHM = "HS256"
+ACCESS_TOKEN_EXPIRE_MINUTES = 30
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class TokenData(BaseModel):
+    username: str | None = None
+
+class UserCreate(BaseModel):
+    username: str
+    email: EmailStr
+    password: str
+
+class UserInDB(BaseModel):
+    username: str
+    email: str
+    hashed_password: str
+
+# Utility functions
+def verify_password(plain_password, hashed_password):
+    return pwd_context.verify(plain_password, hashed_password)
+
+def get_password_hash(password):
+    return pwd_context.hash(password)
+
+def create_access_token(data: dict, expires_delta: datetime.timedelta | None = None):
+    to_encode = data.copy()
+    if expires_delta:
+        expire = datetime.datetime.utcnow() + expires_delta
+    else:
+        expire = datetime.datetime.utcnow() + datetime.timedelta(minutes=15)
+    to_encode.update({"exp": expire})
+    encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return encoded_jwt
+
+async def get_user(username: str):
+    return await User.get(username=username)
+
+async def authenticate_user(username: str, password: str):
+    user = await get_user(username)
+    if not user:
+        return False
+    if not verify_password(password, user.hashed_password):
+        return False
+    return user
+
+# Endpoints
+@app.post("/register", response_model=user_pydantic)
+async def register(user: UserCreate):
+    hashed_password = get_password_hash(user.password)
+    user_obj = User(username=user.username, email=user.email, hashed_password=hashed_password)
+    await user_obj.save()
+    return await user_pydantic.from_tortoise_orm(user_obj)
+
+@app.post("/token", response_model=Token)
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+    user = await authenticate_user(form_data.username, form_data.password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token_expires = datetime.timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user.username}, expires_delta=access_token_expires
+    )
+    return {"access_token": access_token, "token_type": "bearer"}
+
+@app.get("/users/me", response_model=user_pydantic)
+async def read_users_me(token: str = Depends(oauth2_scheme)):
+    credentials_exception = HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail="Could not validate credentials",
+        headers={"WWW-Authenticate": "Bearer"},
+    )
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if username is None:
+            raise credentials_exception
+        token_data = TokenData(username=username)
+    except jwt.PyJWTError as e:
+        logging.error(f"Token decode error: {e}")
+        raise credentials_exception
+    user = await get_user(username=token_data.username)
+    if user is None:
+        raise credentials_exception
+    return await user_pydantic.from_tortoise_orm(user)
+
 @app.get("/")
 def index():
     return {"Msg": "go to /docs for the API documentation"}
 
 @app.post("/supplier")
-async def add_supplier(supplier_info: supplier_pydanticIn): # type: ignore # type: ignore
+async def add_supplier(supplier_info: supplier_pydanticIn): 
     supplier_obj = await Supplier.create(**supplier_info.dict(exclude_unset=True))
     response = await supplier_pydantic.from_tortoise_orm(supplier_obj)
     return {"status": "ok", "data": response}
@@ -47,7 +148,7 @@ async def get_specific_supplier(supplier_id: int):
     return {"status": "ok", "data": response}
 
 @app.put("/supplier/{supplier_id}")
-async def update_supplier(supplier_id: int, update_info: supplier_pydanticIn): # type: ignore
+async def update_supplier(supplier_id: int, update_info: supplier_pydanticIn):
     supplier = await Supplier.get(id=supplier_id)
     update_info = update_info.dict(exclude_unset=True)
     supplier.name = update_info.get('name', supplier.name)
@@ -64,7 +165,7 @@ async def delete_supplier(supplier_id: int):
     return {"status": "ok"}
 
 @app.post("/product/{supplier_id}")
-async def add_product(supplier_id: int, product_details: product_pydanticIn): # type: ignore
+async def add_product(supplier_id: int, product_details: product_pydanticIn):
     supplier = await Supplier.get(id=supplier_id)
     product_details = product_details.dict(exclude_unset=True)
     product_details["revenue"] = product_details["quantity_sold"] * product_details["unit_price"]
@@ -95,7 +196,7 @@ async def specific_product(id: int):
     return {"status": "ok", "data": response}
 
 @app.put("/product/{id}")
-async def update_product(id: int, update_info: product_pydanticIn): # type: ignore
+async def update_product(id: int, update_info: product_pydanticIn):
     product = await Product.get(id=id)
     update_info = update_info.dict(exclude_unset=True)
     product.name = update_info.get("name", product.name)
